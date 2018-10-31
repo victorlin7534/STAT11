@@ -9,21 +9,38 @@
 int main(){
   struct stat data;
   stat("main.c",&data);
+  int i,z;
+  char read[100], perm[11], real[11], temp[100], act[100];
 
-  printf("file size: %ld B\n",data.st_size);
-  printf("file size: %ld KB\n",data.st_size);
-  printf("file size: %ld MB\n",data.st_size);
-  printf("file size: %ld GB\n",data.st_size);
+  sprintf(read,"file size: %0.f B\n",data.st_size/1.0); printf(read);
+  sprintf(read,"file size: %f KB\n",data.st_size/1000.0); printf(read);
+  sprintf(read,"file size: %f MB\n",data.st_size/1000000.0); printf(read);
+  sprintf(read,"file size: %f GB\n",data.st_size/1000000000.0); printf(read);
 
   printf("file permissions: %o\n",data.st_mode);
   printf("time of last access: %s\n",ctime(&data.st_atime));
 
-  
-  struct passwd *x;
-  x = getpwuid(data.st_uid);
-  struct group *y;
-  y = getgrgid(data.st_gid);
+  int mode = data.st_mode;
+  for(i=0,z=1;i<9;i++,z++,mode=mode>>1){
+  	if(mode & 1){
+  		if(z==1) strcat(perm,"x");
+  		if(z==2) strcat(perm,"w");
+  		if(z==3) strcat(perm,"r");
+  	}
+  	else strcat(perm,"-");
+  	if(z==3) z = 1;
+  }
+  strcat(perm,"d");
+  perm[10] = '\0';
+  for(i=0,z=10;i<11;i++,z--)
+  	real[i] = perm[z];
+
+  struct passwd *x; x = getpwuid(data.st_uid);
+  struct group *y; y = getgrgid(data.st_gid);
   char t[16]; strcpy(t,ctime(&data.st_mtime)); t[16] = '\0';
-  printf("%d %s %s %ld %s main.c\n",data.st_nlink,x->pw_name,y->gr_name,data.st_size,t);
+  sprintf(temp," %d %s %s %ld %s main.c\n",data.st_nlink,x->pw_name,y->gr_name,data.st_size,t);
+  strcat(act,real); strcat(act,temp);
+
+  printf(act);
   return 0;
 }
