@@ -10,7 +10,7 @@ int main(){
   struct stat data;
   stat("main.c",&data);
   int i,z;
-  char read[100], perm[11], real[11], temp[100], act[100];
+  char read[100], perm[11];
 
   sprintf(read,"file size: %0.f B\n",data.st_size/1.0); printf(read);
   sprintf(read,"file size: %f KB\n",data.st_size/1000.0); printf(read);
@@ -32,15 +32,13 @@ int main(){
   }
   strcat(perm,"d");
   perm[10] = '\0';
-  for(i=0,z=10;i<11;i++,z--)
-  	real[i] = perm[z];
+  for(i=10;i>=0;i--)
+  	printf("%c",perm[i]);
 
   struct passwd *x; x = getpwuid(data.st_uid);
   struct group *y; y = getgrgid(data.st_gid);
   char t[16]; strcpy(t,ctime(&data.st_mtime)); t[16] = '\0';
-  sprintf(temp," %d %s %s %ld %s main.c\n",data.st_nlink,x->pw_name,y->gr_name,data.st_size,t);
-  strcat(act,real); strcat(act,temp);
+  printf(" %ld %s %s %ld %s main.c\n",data.st_nlink,x->pw_name,y->gr_name,data.st_size,t);
 
-  printf(act);
   return 0;
 }
